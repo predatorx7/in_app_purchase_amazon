@@ -13,6 +13,9 @@ class MockInAppPurchaseAmazonPlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
+  Future<String?> getAmazonSdkMode() => Future.value('Test');
+
+  @override
   void dispose() {
     _clientInformationStreamController?.close();
     _clientInformationStreamController = null;
@@ -37,6 +40,9 @@ class MockInAppPurchaseAmazonPlatform
     _clientInformationStreamController = StreamController.broadcast();
     return Future.value(null);
   }
+  
+  @override
+  Stream<String?> get licenseVerificationResponseStream => throw UnimplementedError();
 }
 
 void main() {

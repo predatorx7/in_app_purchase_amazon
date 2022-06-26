@@ -30,8 +30,14 @@ abstract class InAppPurchaseAmazonPlatform extends PlatformInterface {
 
   Stream<AmazonUserData?> get clientInformationStream;
 
+  Stream<String?> get licenseVerificationResponseStream;
+
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<String?> getAmazonSdkMode() {
+    throw UnimplementedError('amazonSdkMode() has not been implemented.');
   }
 
   Future<AmazonUserData?> getClientInformation() {

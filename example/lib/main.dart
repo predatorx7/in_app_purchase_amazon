@@ -23,7 +23,11 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
-    initAmazon();
+    initAmazon().then((_) {
+      getSdkMode().then((_) {
+        _inAppPurchaseAmazonPlugin.getClientInformation();
+      });
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -48,30 +52,18 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  AmazonUserData? _clientInformation;
+  String? _amazonSdkMode;
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initAmazon() async {
-    AmazonUserData? clientInformation;
+  Future<void> getSdkMode() async {
+    String amazonSdkMode;
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      await _inAppPurchaseAmazonPlugin.initialize();
-
-      _inAppPurchaseAmazonPlugin.clientInformationStream.listen(
-        (event) {
-          debugPrint(event?.toString());
-        },
-        onError: (e, s) {
-          debugPrint(e);
-          debugPrintStack(stackTrace: s);
-        },
-      );
-
-      clientInformation =
-          await _inAppPurchaseAmazonPlugin.getClientInformation();
+      amazonSdkMode = await _inAppPurchaseAmazonPlugin.getAmazonSdkMode() ??
+          'Unknown AppStore SDK Mode';
     } on PlatformException {
-      clientInformation = null;
+      amazonSdkMode = 'Failed to get AppStore SDK Mode.';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -80,7 +72,54 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() {
-      _clientInformation = clientInformation;
+      _amazonSdkMode = amazonSdkMode;
+    });
+  }
+
+  AmazonUserData? _clientInformation;
+  String? _licenseVerificationResponse;
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initAmazon() async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      await _inAppPurchaseAmazonPlugin.initialize();
+
+      _inAppPurchaseAmazonPlugin.licenseVerificationResponseStream.listen(
+        _onLicenseVerificationUpdate,
+        onError: (e, s) {
+          debugPrint(e);
+          debugPrintStack(stackTrace: s);
+          _inAppPurchaseAmazonPlugin.getClientInformation();
+        },
+      );
+
+      _inAppPurchaseAmazonPlugin.clientInformationStream.listen(
+        _onClientInformationUpdate,
+        onError: (e, s) {
+          debugPrint(e);
+          debugPrintStack(stackTrace: s);
+        },
+      );
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: s);
+    }
+  }
+
+  void _onLicenseVerificationUpdate(String? response) {
+    debugPrint('License Verification Response: $response');
+    setState(() {
+      _licenseVerificationResponse = response;
+    });
+    _inAppPurchaseAmazonPlugin.getClientInformation();
+  }
+
+  void _onClientInformationUpdate(AmazonUserData? event) {
+    debugPrint(event?.toString());
+    setState(() {
+      _clientInformation = event;
     });
   }
 
@@ -95,9 +134,17 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Running on: $_platformVersion\n'),
             Text(
-              'User information: ${_clientInformation ?? "'Failed to get platform version.'"}\n',
+              'Running on: $_platformVersion\n',
+            ),
+            Text(
+              'Amazon Appstore SDK mode: $_amazonSdkMode\n',
+            ),
+            Text(
+              'Amazon License verification state: $_licenseVerificationResponse\n',
+            ),
+            Text(
+              'User information: $_clientInformation\n',
             ),
           ],
         ),

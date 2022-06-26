@@ -12,8 +12,17 @@ class InAppPurchaseAmazon {
     return InAppPurchaseAmazonPlatform.instance.clientInformationStream;
   }
 
+  Stream<String?> get licenseVerificationResponseStream {
+    return InAppPurchaseAmazonPlatform
+        .instance.licenseVerificationResponseStream;
+  }
+
   Future<String?> getPlatformVersion() {
     return InAppPurchaseAmazonPlatform.instance.getPlatformVersion();
+  }
+
+  Future<String?> getAmazonSdkMode() {
+    return InAppPurchaseAmazonPlatform.instance.getAmazonSdkMode();
   }
 
   Future<AmazonUserData?> getClientInformation() {

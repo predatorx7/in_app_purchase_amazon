@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Amazon Appstore authentication public key
+android/app/src/main/assets/AppstoreAuthenticationKey.pem

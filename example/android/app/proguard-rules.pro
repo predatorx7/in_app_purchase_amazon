@@ -1,0 +1,4 @@
+-keep class com.amazon.** {*;}
+-keep class com.android.vending.billing.**
+-dontwarn com.amazon.**
+-keepattributes *Annotation*

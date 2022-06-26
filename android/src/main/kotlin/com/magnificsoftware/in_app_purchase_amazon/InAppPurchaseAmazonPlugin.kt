@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.VisibleForTesting
+import com.amazon.device.drm.LicensingService
 import com.amazon.device.iap.PurchasingListener
 import com.amazon.device.iap.PurchasingService
 import com.amazon.device.iap.model.ProductDataResponse
@@ -23,10 +24,13 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
 
     @VisibleForTesting
     internal object MethodNames {
+        const val INITIALIZE = "AmazonIAPClient#initialize()"
         const val PLATFORM_VERSION = "AmazonIAPClient#getPlatformVersion()"
         const val CLIENT_INFORMATION = "AmazonIAPClient#getClientInformation()"
         const val CLIENT_INFORMATION_CALLBACK =
             "AmazonIAPClient#onClientInformation(AmazonUserData)"
+        const val SDK_MODE = "AmazonIAPClient#getSDKMode()"
+        const val LICENSE_VERIFICATION_RESPONSE_CALLBACK = "AmazonIAPClient#onLicenseVerificationResponse()"
     }
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -67,12 +71,24 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
         }
 
         when (call.method) {
+            MethodNames.INITIALIZE -> {
+                LicensingService.verifyLicense(applicationContext
+                ) {
+                    Log.d(tag, "License verification response ${it.requestStatus}")
+                    methodResult?.invokeMethod(MethodNames.LICENSE_VERIFICATION_RESPONSE_CALLBACK, it.requestStatus.name)
+                };
+                result.success(true);
+            }
             MethodNames.PLATFORM_VERSION -> {
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
             }
             MethodNames.CLIENT_INFORMATION -> {
                 val data = PurchasingService.getUserData();
                 Log.d(tag, "Requesting user data from purchasing service: ${data.toJSON()}");
+                Log.d(tag, "Appstore SDK Mode: " + LicensingService.getAppstoreSDKMode());
+            }
+            MethodNames.SDK_MODE -> {
+                result.success(LicensingService.getAppstoreSDKMode())
             }
             else -> {
                 result.notImplemented()

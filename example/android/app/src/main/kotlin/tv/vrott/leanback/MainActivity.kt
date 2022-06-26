@@ -1,4 +1,4 @@
-package com.magnificsoftware.in_app_purchase_amazon_example
+package tv.vrott.leanback
 
 import io.flutter.embedding.android.FlutterActivity
 
