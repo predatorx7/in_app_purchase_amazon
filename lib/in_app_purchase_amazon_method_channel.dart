@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'in_app_purchase_amazon_platform_interface.dart';
+import 'user_data.dart';
 
 class _MethodNames {
   static const PLATFORM_VERSION = "AmazonIAPClient#getPlatformVersion()";
@@ -40,10 +41,11 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
   }
 
   @override
-  Future<Object?> getClientInformation() async {
-    return methodChannel.invokeMethod<Object>(
+  Future<AmazonUserData?> getClientInformation() async {
+    final data = await methodChannel.invokeMethod<Object>(
       _MethodNames.CLIENT_INFORMATION,
     );
+    return data == null ? null : AmazonUserData.fromJson(data);
   }
 
   void _attachMethodChannelListeners() {
@@ -51,20 +53,27 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
     return methodChannel.setMethodCallHandler(_onMethodCall);
   }
 
-  StreamController<Object?>? _clientInformationStreamController;
+  StreamController<AmazonUserData?>? _clientInformationStreamController;
 
   @override
-  Stream get clientInformationStream =>
+  Stream<AmazonUserData?> get clientInformationStream =>
       _clientInformationStreamController!.stream;
 
   Future<Object?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case _MethodNames.CLIENT_INFORMATION_CALLBACK:
         final Object? value = call.arguments;
-        _clientInformationStreamController?.add(value);
+        _clientInformationStreamController
+            ?.add(value != null ? AmazonUserData.fromJson(value) : null);
         break;
       default:
-        throw ArgumentError('Unknown method ${call.method}');
+        final e = ArgumentError('Unknown method ${call.method}');
+        final controller = _clientInformationStreamController;
+        if (controller != null) {
+          controller.addError(e, StackTrace.current);
+        } else {
+          throw e;
+        }
     }
     return Future.value(null);
   }

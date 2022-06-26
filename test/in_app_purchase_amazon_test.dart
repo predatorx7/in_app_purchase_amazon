@@ -19,15 +19,15 @@ class MockInAppPurchaseAmazonPlatform
     Future.value(null);
   }
 
-  StreamController<Object?>? _clientInformationStreamController;
+  StreamController<AmazonUserData?>? _clientInformationStreamController;
 
   @override
-  Stream get clientInformationStream =>
+  Stream<AmazonUserData?> get clientInformationStream =>
       _clientInformationStreamController!.stream;
 
   @override
-  Future<Object?> getClientInformation() {
-    final o = Object();
+  Future<AmazonUserData?> getClientInformation() {
+    const o = AmazonUserData(null, null, 'test');
     _clientInformationStreamController?.add(o);
     return Future.value(o);
   }

@@ -23,6 +23,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+    initAmazon();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -47,6 +48,42 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  AmazonUserData? _clientInformation;
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initAmazon() async {
+    AmazonUserData? clientInformation;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      await _inAppPurchaseAmazonPlugin.initialize();
+
+      _inAppPurchaseAmazonPlugin.clientInformationStream.listen(
+        (event) {
+          debugPrint(event?.toString());
+        },
+        onError: (e, s) {
+          debugPrint(e);
+          debugPrintStack(stackTrace: s);
+        },
+      );
+
+      clientInformation =
+          await _inAppPurchaseAmazonPlugin.getClientInformation();
+    } on PlatformException {
+      clientInformation = null;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _clientInformation = clientInformation;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -54,8 +91,15 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('Running on: $_platformVersion\n'),
+            Text(
+              'User information: ${_clientInformation ?? "'Failed to get platform version.'"}\n',
+            ),
+          ],
         ),
       ),
     );
