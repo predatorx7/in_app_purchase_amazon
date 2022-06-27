@@ -4,7 +4,7 @@ A new Flutter plugin project.
 
 ## Getting Started
 
-- Install Amazon App Store on Target device
+- Install Amazon App Store on Target device from https://www.amazon.com/Amazon-App-Tester/dp/B00BN3YZM2/
 
 - Add below query in AndroidManifest.xml
 ```xml

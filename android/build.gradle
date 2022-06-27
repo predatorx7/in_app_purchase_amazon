@@ -48,4 +48,5 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.amazon.device:amazon-appstore-sdk:3.+'
+    // implementation files('libs/amazon-appstore-sdk-3.0.2.jar')
 }

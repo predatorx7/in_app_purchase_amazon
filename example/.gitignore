@@ -48,3 +48,7 @@ app.*.map.json
 
 # Amazon Appstore authentication public key
 android/app/src/main/assets/AppstoreAuthenticationKey.pem
+
+secrets/
+logs.txt
+logs-sample.txt
