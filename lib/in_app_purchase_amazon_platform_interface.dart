@@ -40,7 +40,7 @@ abstract class InAppPurchaseAmazonPlatform extends PlatformInterface {
     throw UnimplementedError('amazonSdkMode() has not been implemented.');
   }
 
-  Future<AmazonUserData?> getClientInformation() {
+  Future<bool> getClientInformation() {
     throw UnimplementedError(
         'getClientInformation() has not been implemented.');
   }

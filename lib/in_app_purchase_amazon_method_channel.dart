@@ -65,11 +65,11 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
   }
 
   @override
-  Future<AmazonUserData?> getClientInformation() async {
+  Future<bool> getClientInformation() async {
     final data = await methodChannel.invokeMethod<Object>(
       _MethodNames.CLIENT_INFORMATION,
     );
-    return data == null ? null : AmazonUserData.fromJson(data);
+    return data == true;
   }
 
   void _attachMethodChannelListeners() {

@@ -86,6 +86,7 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
                 val data = PurchasingService.getUserData();
                 Log.d(tag, "Requesting user data from purchasing service: ${data.toJSON()}");
                 Log.d(tag, "Appstore SDK Mode: " + LicensingService.getAppstoreSDKMode());
+                result.success(true)
             }
             MethodNames.SDK_MODE -> {
                 result.success(LicensingService.getAppstoreSDKMode())
@@ -133,7 +134,6 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
                 if (result == null) {
                     Log.d(tag, "Method result is null")
                 } else {
-                    result.success(item)
                     result.invokeMethod(MethodNames.CLIENT_INFORMATION_CALLBACK, item)
                 }
             } catch (e: Exception) {

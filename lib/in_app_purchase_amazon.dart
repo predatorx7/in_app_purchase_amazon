@@ -25,7 +25,7 @@ class InAppPurchaseAmazon {
     return InAppPurchaseAmazonPlatform.instance.getAmazonSdkMode();
   }
 
-  Future<AmazonUserData?> getClientInformation() {
+  Future<bool> getClientInformation() {
     return InAppPurchaseAmazonPlatform.instance.getClientInformation();
   }
 }
