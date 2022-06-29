@@ -50,5 +50,4 @@ app.*.map.json
 android/app/src/main/assets/AppstoreAuthenticationKey.pem
 
 secrets/
-logs.txt
-logs-sample.txt
+./*.log
