@@ -8,7 +8,7 @@ class InAppPurchaseAmazon {
     return InAppPurchaseAmazonPlatform.instance.initialize();
   }
 
-  Future<bool?> updatePackageInstaller(String installerPackageName) {
+  static Future<bool?> updatePackageInstaller(String installerPackageName) {
     return InAppPurchaseAmazonPlatform.instance.updatePackageInstaller(
       installerPackageName,
     );
