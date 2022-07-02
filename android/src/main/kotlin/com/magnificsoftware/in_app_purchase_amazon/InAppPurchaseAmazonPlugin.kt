@@ -24,13 +24,15 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
 
     @VisibleForTesting
     internal object MethodNames {
+        const val UPDATE_PACKAGE_INSTALLER = "Additional#updatePackageInstaller()"
         const val INITIALIZE = "AmazonIAPClient#initialize()"
         const val PLATFORM_VERSION = "AmazonIAPClient#getPlatformVersion()"
         const val CLIENT_INFORMATION = "AmazonIAPClient#getClientInformation()"
         const val CLIENT_INFORMATION_CALLBACK =
             "AmazonIAPClient#onClientInformation(AmazonUserData)"
         const val SDK_MODE = "AmazonIAPClient#getSDKMode()"
-        const val LICENSE_VERIFICATION_RESPONSE_CALLBACK = "AmazonIAPClient#onLicenseVerificationResponse()"
+        const val LICENSE_VERIFICATION_RESPONSE_CALLBACK =
+            "AmazonIAPClient#onLicenseVerificationResponse()"
     }
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -54,6 +56,23 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         methodResult = MethodResultWrapper(result, channel);
 
+        if (call.method == MethodNames.UPDATE_PACKAGE_INSTALLER) {
+            val pm = applicationContext?.packageManager;
+            val packageName = applicationContext?.packageName;
+
+            if (pm != null && packageName != null) {
+                try {
+                    pm.setInstallerPackageName(packageName, call.arguments as String);
+                    result.success(true)
+                } catch (e: Exception) {
+                    result.error("PM_FAILED", "PM failed: ${e.message}", null)
+                }
+            } else {
+                result.error("PM_FAILED", "PM failed", null);
+            }
+            return
+        }
+
         try {
             if (applicationContext != null) {
                 PurchasingService.registerListener(applicationContext, purchasesUpdatedListener)
@@ -72,10 +91,14 @@ class InAppPurchaseAmazonPlugin : FlutterPlugin, MethodCallHandler {
 
         when (call.method) {
             MethodNames.INITIALIZE -> {
-                LicensingService.verifyLicense(applicationContext
+                LicensingService.verifyLicense(
+                    applicationContext
                 ) {
                     Log.d(tag, "License verification response ${it.requestStatus}")
-                    methodResult?.invokeMethod(MethodNames.LICENSE_VERIFICATION_RESPONSE_CALLBACK, it.requestStatus.name)
+                    methodResult?.invokeMethod(
+                        MethodNames.LICENSE_VERIFICATION_RESPONSE_CALLBACK,
+                        it.requestStatus.name
+                    )
                 };
                 result.success(true);
             }

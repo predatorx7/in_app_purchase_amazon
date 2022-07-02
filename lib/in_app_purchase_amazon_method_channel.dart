@@ -9,6 +9,7 @@ import 'in_app_purchase_amazon_platform_interface.dart';
 import 'user_data.dart';
 
 class _MethodNames {
+  static const UPDATE_PACKAGE_INSTALLER = "Additional#updatePackageInstaller()";
   static const INITIALIZE = "AmazonIAPClient#initialize()";
   static const PLATFORM_VERSION = "AmazonIAPClient#getPlatformVersion()";
   static const CLIENT_INFORMATION = "AmazonIAPClient#getClientInformation()";
@@ -27,6 +28,14 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
       'plugins.magnificsoftware.com/in_app_purchase_amazon');
 
   Completer<void>? _completer;
+
+  @override
+  Future<bool?> updatePackageInstaller(String installerPackageName) {
+    return methodChannel.invokeMethod<bool>(
+      _MethodNames.UPDATE_PACKAGE_INSTALLER,
+      installerPackageName,
+    );
+  }
 
   @override
   Future<void> initialize() async {

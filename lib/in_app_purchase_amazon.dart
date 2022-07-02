@@ -8,6 +8,12 @@ class InAppPurchaseAmazon {
     return InAppPurchaseAmazonPlatform.instance.initialize();
   }
 
+  Future<bool?> updatePackageInstaller(String installerPackageName) {
+    return InAppPurchaseAmazonPlatform.instance.updatePackageInstaller(
+      installerPackageName,
+    );
+  }
+
   Stream<AmazonUserData?> get clientInformationStream {
     return InAppPurchaseAmazonPlatform.instance.clientInformationStream;
   }

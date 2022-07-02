@@ -29,6 +29,11 @@ class MockInAppPurchaseAmazonPlatform
       _clientInformationStreamController!.stream;
 
   @override
+  Future<bool?> updatePackageInstaller(String installerPackageName) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<bool> getClientInformation() {
     const o = AmazonUserData(null, null, 'test');
     _clientInformationStreamController?.add(o);
@@ -40,9 +45,10 @@ class MockInAppPurchaseAmazonPlatform
     _clientInformationStreamController = StreamController.broadcast();
     return Future.value(null);
   }
-  
+
   @override
-  Stream<String?> get licenseVerificationResponseStream => throw UnimplementedError();
+  Stream<String?> get licenseVerificationResponseStream =>
+      throw UnimplementedError();
 }
 
 void main() {

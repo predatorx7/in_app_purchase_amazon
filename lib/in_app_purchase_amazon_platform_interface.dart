@@ -28,6 +28,8 @@ abstract class InAppPurchaseAmazonPlatform extends PlatformInterface {
 
   Future<void> initialize();
 
+  Future<bool?> updatePackageInstaller(String installerPackageName);
+
   Stream<AmazonUserData?> get clientInformationStream;
 
   Stream<String?> get licenseVerificationResponseStream;
