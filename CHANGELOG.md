@@ -1,3 +1,7 @@
-## 0.0.1
+## 1.1.0
 
-* TODO: Describe initial release.
+- Add payment execution and history APIs
+
+## 1.0.0
+
+- Add client information stream
