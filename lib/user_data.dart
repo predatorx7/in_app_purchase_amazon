@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'utils.dart';
+
 part 'user_data.g.dart';
 
 @JsonSerializable()
@@ -11,13 +13,7 @@ class AmazonUserData {
   const AmazonUserData(this.marketplace, this.userId, this.status);
 
   factory AmazonUserData.fromJson(dynamic data) {
-    final Map<Object?, Object?> value = data;
-    final json = <String, dynamic>{};
-    for (var i = 0; i < value.length; i++) {
-      final k = value.entries.elementAt(i).key;
-      json[k?.toString() ?? ''] = value.entries.elementAt(i).value;
-    }
-    return _$AmazonUserDataFromJson(json);
+    return _$AmazonUserDataFromJson(fromMapMethodChannelJson(data));
   }
 
   Map<String, dynamic> toJson() => _$AmazonUserDataToJson(this);

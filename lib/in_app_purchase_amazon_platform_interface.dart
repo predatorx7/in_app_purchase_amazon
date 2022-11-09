@@ -30,9 +30,23 @@ abstract class InAppPurchaseAmazonPlatform extends PlatformInterface {
 
   Future<bool?> updatePackageInstaller(String installerPackageName);
 
+  Future<bool> requestSkus(Set<String> skus);
+
+  Future<bool> startPurchase(String sku);
+
+  Future<bool> requestPurchaseUpdatesInformation([bool activate = true]);
+
   Stream<AmazonUserData?> get clientInformationStream;
 
   Stream<String?> get licenseVerificationResponseStream;
+
+  Stream<Object?> get errorStream;
+
+  Stream<Object?> get skusStream;
+
+  Stream<Object?> get purchaseStream;
+
+  Stream<Object?> get purchaseUpdatesStream;
 
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
