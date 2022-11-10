@@ -31,12 +31,14 @@ class _MethodNames {
 
 /// An implementation of [InAppPurchaseAmazonPlatform] that uses method channels.
 class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
+  MethodChannelInAppPurchaseAmazon() {
+    methodChannel.setMethodCallHandler(_onMethodCall);
+  }
+
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel(
       'plugins.magnificsoftware.com/in_app_purchase_amazon');
-
-  Completer<void>? _completer;
 
   @override
   Future<bool?> updatePackageInstaller(String installerPackageName) {
@@ -48,24 +50,7 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
 
   @override
   Future<void> initialize() async {
-    if (_completer != null) return _completer!.future;
-
-    _attachMethodChannelListeners();
-
-    final completer = _completer ?? Completer();
-    _completer = completer;
-
-    if (!completer.isCompleted) {
-      try {
-        await methodChannel.invokeMethod(_MethodNames.INITIALIZE);
-        completer.complete();
-      } on PlatformException catch (e) {
-        completer.completeError(e);
-        _completer = null;
-      }
-    }
-
-    return completer.future;
+    await methodChannel.invokeMethod(_MethodNames.INITIALIZE);
   }
 
   @override
@@ -118,24 +103,18 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
     return data == true;
   }
 
-  void _attachMethodChannelListeners() {
-    close();
-    _clientInformationStreamController = StreamController.broadcast();
-    _licenseVerificationResponseStreamController = StreamController.broadcast();
-    _errorStreamController = StreamController.broadcast();
-    _skusStreamController = StreamController.broadcast();
-    _purchaseStreamController = StreamController.broadcast();
-    _purchaseUpdatesStreamController = StreamController.broadcast();
-    _mounted = true;
-    return methodChannel.setMethodCallHandler(_onMethodCall);
-  }
-
-  late StreamController<AmazonUserData?> _clientInformationStreamController;
-  late StreamController<String?> _licenseVerificationResponseStreamController;
-  late StreamController<Object?> _errorStreamController;
-  late StreamController<Object?> _skusStreamController;
-  late StreamController<Object?> _purchaseStreamController;
-  late StreamController<Object?> _purchaseUpdatesStreamController;
+  final StreamController<AmazonUserData?> _clientInformationStreamController =
+      StreamController<AmazonUserData?>();
+  final _licenseVerificationResponseStreamController =
+      StreamController<String?>.broadcast();
+  final StreamController<Object?> _errorStreamController =
+      StreamController<Object?>.broadcast();
+  final StreamController<Object?> _skusStreamController =
+      StreamController<Object?>.broadcast();
+  final StreamController<Object?> _purchaseStreamController =
+      StreamController<Object?>.broadcast();
+  final StreamController<Object?> _purchaseUpdatesStreamController =
+      StreamController<Object?>.broadcast();
 
   @override
   Stream<AmazonUserData?> get clientInformationStream =>
@@ -199,25 +178,5 @@ class MethodChannelInAppPurchaseAmazon extends InAppPurchaseAmazonPlatform {
         _errorStreamController.addError(e, StackTrace.current);
     }
     return Future.value(null);
-  }
-
-  bool _mounted = false;
-
-  void close() {
-    if (!_mounted) return;
-    _clientInformationStreamController.close();
-    _licenseVerificationResponseStreamController.close();
-    _errorStreamController.close();
-    _skusStreamController.close();
-    _purchaseStreamController.close();
-    _purchaseUpdatesStreamController.close();
-    _completer = null;
-    _mounted = false;
-  }
-
-  @override
-  void dispose() {
-    close();
-    super.dispose();
   }
 }
